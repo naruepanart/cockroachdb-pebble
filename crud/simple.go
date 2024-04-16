@@ -18,9 +18,7 @@ func CreateKeyValue(db *pebble.DB, key, value []byte) error {
 	}
 
 	// Set the key-value pair in the database
-	if err := db.Set(key, value, nil); err != nil {
-		return fmt.Errorf("failed to create key-value pair: %w", err)
-	}
+	db.Set(key, value, nil)
 	log.Printf("Created key-value pair: %s => %s", key, value)
 	return nil
 }
@@ -54,9 +52,7 @@ func UpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 	}
 
 	// Update the key-value pair in the database
-	if err := db.Set(key, newValue, nil); err != nil {
-		return fmt.Errorf("failed to update key-value pair: %w", err)
-	}
+	db.Set(key, newValue, nil)
 	log.Printf("Updated key-value pair: %s => %s", key, newValue)
 	return nil
 }
@@ -69,9 +65,7 @@ func DeleteKeyValue(db *pebble.DB, key []byte) error {
 	}
 
 	// Delete the key-value pair from the database
-	if err := db.Delete(key, nil); err != nil {
-		return fmt.Errorf("failed to delete key-value pair: %w", err)
-	}
+	db.Delete(key, nil)
 	log.Printf("Deleted key-value pair: %s", key)
 	return nil
 }
