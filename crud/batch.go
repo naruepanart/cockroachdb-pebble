@@ -2,6 +2,8 @@ package crud
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/cockroachdb/pebble"
 )
 
@@ -30,8 +32,36 @@ func BatchReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to get value for key: %w", err)
 	}
 	defer closer.Close()
-	
+
 	return value, nil
+}
+
+// handles multiple read operations concurrently using worker pools.
+func BatchReadKeyValueWorker(db *pebble.DB, keys []string) (map[string][]byte, error) {
+	results := make(map[string][]byte)
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	wg.Add(len(keys))
+
+	for _, key := range keys {
+		go func(key string) {
+			defer wg.Done()
+			value, closer, err := db.Get([]byte(key))
+			if err != nil {
+				// Handle error appropriately
+				return
+			}
+			defer closer.Close()
+
+			mu.Lock()
+			results[key] = value
+			mu.Unlock()
+		}(key)
+	}
+
+	wg.Wait()
+
+	return results, nil
 }
 
 // updates an existing key-value pair with a new value using a batch operation for improved performance.
