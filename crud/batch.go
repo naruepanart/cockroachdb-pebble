@@ -25,17 +25,13 @@ func BatchCreateKeyValue(db *pebble.DB, key, value []byte) error {
 
 // retrieves the value associated with a key and properly handles the closer.
 func BatchReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
-	retrievedValue, closer, err := db.Get(key)
+	value, closer, err := db.Get(key)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get value for key: %w", err)
 	}
-	defer func() {
-		if err := closer.Close(); err != nil {
-			fmt.Println("Failed to close closer:", err)
-		}
-	}()
-
-	return retrievedValue, nil
+	defer closer.Close()
+	
+	return value, nil
 }
 
 // updates an existing key-value pair with a new value using a batch operation for improved performance.
