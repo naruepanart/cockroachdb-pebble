@@ -8,7 +8,7 @@ import (
 
 func TestCrudFunctions(t *testing.T) {
 	// Define the database path
-	dbPath := "test-db"
+	dbPath := "simple-test-db"
 
 	// Open the Pebble database
 	db, err := pebble.Open(dbPath, &pebble.Options{})
