@@ -12,15 +12,8 @@ func BatchCreateKeyValue(db *pebble.DB, key, value []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	err := batch.Set(key, value, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create key-value pair: %w", err)
-	}
-
-	// Commit the batch
-	if err := batch.Commit(nil); err != nil {
-		return fmt.Errorf("failed to commit batch: %w", err)
-	}
+	batch.Set(key, value, nil)
+	batch.Commit(nil)
 
 	return nil
 }
@@ -69,15 +62,8 @@ func BatchUpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	err := batch.Set(key, newValue, nil)
-	if err != nil {
-		return fmt.Errorf("failed to update key-value pair: %w", err)
-	}
-
-	// Commit the batch
-	if err := batch.Commit(nil); err != nil {
-		return fmt.Errorf("failed to commit batch: %w", err)
-	}
+	batch.Set(key, newValue, nil)
+	batch.Commit(nil)
 
 	return nil
 }
@@ -87,15 +73,8 @@ func BatchDeleteKeyValue(db *pebble.DB, key []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	err := batch.Delete(key, nil)
-	if err != nil {
-		return fmt.Errorf("failed to delete key-value pair: %w", err)
-	}
-
-	// Commit the batch
-	if err := batch.Commit(nil); err != nil {
-		return fmt.Errorf("failed to commit batch: %w", err)
-	}
+	batch.Delete(key, nil)
+	batch.Commit(nil)
 
 	return nil
 }
