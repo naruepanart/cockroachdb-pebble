@@ -1,7 +1,6 @@
 package crud
 
 import (
-	"log"
 	"testing"
 	"github.com/cockroachdb/pebble"
 )
@@ -13,16 +12,25 @@ func TestBatchCrudFunctions(t *testing.T) {
 	// Open the Pebble database
 	db, err := pebble.Open(dbPath, &pebble.Options{})
 	if err != nil {
-		log.Fatalf("failed to open Pebble database: %v", err)
+		t.Fatalf("failed to open Pebble database: %v", err)
 	}
-	defer db.Close() // Ensure the database is closed when the program exits
+	defer db.Close()
+
+	// Ensure the database is closed when the program exits
 
 	// Define key-value pairs for testing
 	key1 := []byte("key1")
 	value1 := []byte("value1")
+	key2 := []byte("key2")
+	value2 := []byte("value2")
+	nonExistingKey := []byte("non_existing_key")
+	newValue1 := []byte("new_value1")
 
 	// Test BatchCreateKeyValue function
 	if err := BatchCreateKeyValue(db, key1, value1); err != nil {
+		t.Errorf("BatchCreateKeyValue failed: %v", err)
+	}
+	if err := BatchCreateKeyValue(db, key2, value2); err != nil {
 		t.Errorf("BatchCreateKeyValue failed: %v", err)
 	}
 
@@ -35,12 +43,18 @@ func TestBatchCrudFunctions(t *testing.T) {
 		t.Errorf("expected value %s, got %s", value1, retrievedValue)
 	}
 
+	retrievedValue, err = BatchReadKeyValue(db, key2)
+	if err != nil {
+		t.Errorf("BatchReadKeyValue failed: %v", err)
+	}
+	if string(retrievedValue) != string(value2) {
+		t.Errorf("expected value %s, got %s", value2, retrievedValue)
+	}
+
 	// Test BatchUpdateKeyValue function
-	newValue1 := []byte("new_value1")
 	if err := BatchUpdateKeyValue(db, key1, newValue1); err != nil {
 		t.Errorf("BatchUpdateKeyValue failed: %v", err)
 	}
-
 	retrievedValue, err = BatchReadKeyValue(db, key1)
 	if err != nil {
 		t.Errorf("BatchReadKeyValue failed: %v", err)
@@ -49,11 +63,18 @@ func TestBatchCrudFunctions(t *testing.T) {
 		t.Errorf("expected value %s, got %s", newValue1, retrievedValue)
 	}
 
+	// Test updating a non-existing key
+	err = BatchUpdateKeyValue(db, nonExistingKey, newValue1)
+	if err != nil {
+		t.Errorf("BatchUpdateKeyValue failed when updating non-existing key: %v", err)
+	}
+
 	// Test BatchDeleteKeyValue function
 	if err := BatchDeleteKeyValue(db, key1); err != nil {
 		t.Errorf("BatchDeleteKeyValue failed: %v", err)
 	}
 
+	// Ensure the key is deleted
 	retrievedValue, err = BatchReadKeyValue(db, key1)
 	if err == nil {
 		t.Errorf("expected error when reading deleted key, got none")
@@ -68,19 +89,17 @@ func TestBatchCrudFunctions(t *testing.T) {
 	if err != nil {
 		t.Errorf("BatchReadKeyValueWorker failed: %v", err)
 	}
-
 	for key, value := range results {
-		// Since key1 is deleted, we expect it not to be present in results
+		// Check that the deleted key is missing
 		if key == "key1" {
 			if len(value) != 0 {
 				t.Errorf("expected key1 to be missing or empty, got %s", value)
 			}
 		}
-
-		// For key2, since we haven't added it, we expect it to be missing or empty
+		// Check other keys
 		if key == "key2" {
-			if len(value) != 0 {
-				t.Errorf("expected key2 to be missing or empty, got %s", value)
+			if string(value) != string(value2) {
+				t.Errorf("expected value %s, got %s", value2, value)
 			}
 		}
 	}
