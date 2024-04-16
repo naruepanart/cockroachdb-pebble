@@ -3,8 +3,8 @@ package main
 import (
 	"abcc/crud"
 	"fmt"
-	"log"
 	"github.com/cockroachdb/pebble"
+	"log"
 )
 
 func main() {
@@ -28,6 +28,16 @@ func main() {
 		log.Fatalf("CreateKeyValue error: %v", err)
 	}
 	fmt.Println("Key-value pair created")
+
+	// for i := 0; i < 100; i++ {
+	// 	key := []byte("key" + strconv.Itoa(i))
+	// 	value := []byte("value" + strconv.Itoa(i))
+	// 	err = crud.CreateKeyValue(db, key, value)
+	// 	if err != nil {
+	// 		log.Fatalf("CreateKeyValue error: %v", err)
+	// 	}
+	// 	fmt.Println("Key-value pair created")
+	// }
 
 	// Read
 	retrievedValue, err := crud.ReadKeyValue(db, key)
