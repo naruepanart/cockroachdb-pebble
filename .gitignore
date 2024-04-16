@@ -31,3 +31,5 @@ go.work
 
 # database path
 abc-pebble-db
+crud/test-db
+crud/batch-test-db
