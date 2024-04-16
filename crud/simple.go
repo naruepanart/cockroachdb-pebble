@@ -2,8 +2,6 @@ package crud
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/cockroachdb/pebble"
 )
 
@@ -19,7 +17,6 @@ func CreateKeyValue(db *pebble.DB, key, value []byte) error {
 
 	// Set the key-value pair in the database
 	db.Set(key, value, nil)
-	log.Printf("Created key-value pair: %s => %s", key, value)
 	return nil
 }
 
@@ -37,7 +34,6 @@ func ReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 	}
 	defer closer.Close() // Ensure the closer is closed properly
 
-	log.Printf("Read value for key %s: %s", key, value)
 	return value, nil
 }
 
@@ -53,7 +49,6 @@ func UpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 
 	// Update the key-value pair in the database
 	db.Set(key, newValue, nil)
-	log.Printf("Updated key-value pair: %s => %s", key, newValue)
 	return nil
 }
 
@@ -66,6 +61,5 @@ func DeleteKeyValue(db *pebble.DB, key []byte) error {
 
 	// Delete the key-value pair from the database
 	db.Delete(key, nil)
-	log.Printf("Deleted key-value pair: %s", key)
 	return nil
 }
