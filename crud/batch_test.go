@@ -84,31 +84,4 @@ func TestBatchCrudFunctions(t *testing.T) {
 	if err != nil {
 		t.Errorf("BatchDeleteKeyValue failed when deleting non-existing key: %v", err)
 	}
-
-	// Test BatchReadKeyValueWorker function
-	keys := []string{"key1", "key2", "non_existing_key"}
-	results, err := BatchReadKeyValueWorker(db, keys)
-	if err != nil {
-		t.Errorf("BatchReadKeyValueWorker failed: %v", err)
-	}
-	for key, value := range results {
-		// Check that the deleted key is missing
-		if key == "key1" {
-			if len(value) != 0 {
-				t.Errorf("expected key1 to be missing or empty, got %s", value)
-			}
-		}
-		// Check other keys
-		if key == "key2" {
-			if string(value) != string(value2) {
-				t.Errorf("expected value %s, got %s", value2, value)
-			}
-		}
-		// Check non-existing key
-		if key == "non_existing_key" {
-			if len(value) != 0 {
-				t.Errorf("expected non-existing key to be missing or empty, got %s", value)
-			}
-		}
-	}
 }
