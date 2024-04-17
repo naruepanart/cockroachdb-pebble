@@ -2,10 +2,7 @@ package crud
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
-	"time"
-
 	"github.com/cockroachdb/pebble"
 )
 
