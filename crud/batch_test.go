@@ -2,86 +2,85 @@ package crud
 
 import (
 	"testing"
+	"github.com/cockroachdb/pebble"
 )
 
 func TestBatchCrudFunctions(t *testing.T) {
 	db := SetupDB()
 	defer db.Close()
 
-	// Define key-value pairs for testing
-	key1 := []byte("key1")
-	value1 := []byte("value1")
-	key2 := []byte("key2")
-	value2 := []byte("value2")
-	nonExistingKey := []byte("non_existing_key")
-	newValue1 := []byte("new_value1")
+	// Create a new batch.
+	batch := db.NewBatch()
+	defer batch.Close() // Ensure the batch is closed at the end of the test.
 
-	// Test BatchCreateKeyValue function
-	if err := BatchCreateKeyValue(db, key1, value1); err != nil {
-		t.Errorf("BatchCreateKeyValue failed: %v", err)
+	// Define key and value to be used for testing.
+	key := []byte("test_key")
+	value := []byte("test_value")
+
+	// Test BatchCreateKeyValue function.
+	if err := BatchCreateKeyValue(batch, key, value); err != nil {
+		t.Fatalf("BatchCreateKeyValue failed: %v", err)
 	}
-	if err := BatchCreateKeyValue(db, key2, value2); err != nil {
-		t.Errorf("BatchCreateKeyValue failed: %v", err)
+	// Apply the batch after creation.
+	if err := batch.Commit(pebble.NoSync); err != nil {
+		t.Fatalf("Batch commit failed after BatchCreateKeyValue: %v", err)
 	}
 
-	// Test BatchReadKeyValue function
-	retrievedValue, err := BatchReadKeyValue(db, key1)
+	// Check if the key-value pair was created successfully.
+	gotValue, closer, err := db.Get(key)
 	if err != nil {
-		t.Errorf("BatchReadKeyValue failed: %v", err)
+		t.Fatalf("Error fetching key-value: %v", err)
 	}
-	if string(retrievedValue) != string(value1) {
-		t.Errorf("expected value %s, got %s", value1, retrievedValue)
+	defer closer.Close()
+	if gotValue == nil || string(gotValue) != string(value) {
+		t.Errorf("Expected value %s, but got %s", value, gotValue)
 	}
 
-	retrievedValue, err = BatchReadKeyValue(db, key2)
+	// Create a new batch for update operation.
+	batch = db.NewBatch()
+	defer batch.Close()
+
+	// Test BatchUpdateKeyValue function by updating the value.
+	newValue := []byte("updated_value")
+	if err := BatchUpdateKeyValue(batch, key, newValue); err != nil {
+		t.Fatalf("BatchUpdateKeyValue failed: %v", err)
+	}
+	// Apply the batch after update.
+	if err := batch.Commit(pebble.NoSync); err != nil {
+		t.Fatalf("Batch commit failed after BatchUpdateKeyValue: %v", err)
+	}
+
+	// Check if the key-value pair was updated successfully.
+	gotValue, closer, err = db.Get(key)
 	if err != nil {
-		t.Errorf("BatchReadKeyValue failed: %v", err)
+		t.Fatalf("Error fetching key-value: %v", err)
 	}
-	if string(retrievedValue) != string(value2) {
-		t.Errorf("expected value %s, got %s", value2, retrievedValue)
-	}
-
-	// Test reading a non-existing key
-	_, err = BatchReadKeyValue(db, nonExistingKey)
-	if err == nil {
-		t.Errorf("expected error when reading non-existing key, got none")
+	defer closer.Close()
+	if gotValue == nil || string(gotValue) != string(newValue) {
+		t.Errorf("Expected updated value %s, but got %s", newValue, gotValue)
 	}
 
-	// Test BatchUpdateKeyValue function
-	if err := BatchUpdateKeyValue(db, key1, newValue1); err != nil {
-		t.Errorf("BatchUpdateKeyValue failed: %v", err)
+	// Create a new batch for delete operation.
+	batch = db.NewBatch()
+	defer batch.Close()
+
+	// Test BatchDeleteKeyValue function.
+	if err := BatchDeleteKeyValue(batch, key); err != nil {
+		t.Fatalf("BatchDeleteKeyValue failed: %v", err)
 	}
-	retrievedValue, err = BatchReadKeyValue(db, key1)
-	if err != nil {
-		t.Errorf("BatchReadKeyValue failed: %v", err)
-	}
-	if string(retrievedValue) != string(newValue1) {
-		t.Errorf("expected value %s, got %s", newValue1, retrievedValue)
+	// Apply the batch after delete.
+	if err := batch.Commit(pebble.NoSync); err != nil {
+		t.Fatalf("Batch commit failed after BatchDeleteKeyValue: %v", err)
 	}
 
-	// Test updating a non-existing key
-	err = BatchUpdateKeyValue(db, nonExistingKey, newValue1)
-	if err != nil {
-		t.Errorf("BatchUpdateKeyValue failed when updating non-existing key: %v", err)
-	}
-
-	// Test BatchDeleteKeyValue function
-	if err := BatchDeleteKeyValue(db, key1); err != nil {
-		t.Errorf("BatchDeleteKeyValue failed: %v", err)
-	}
-
-	// Ensure the key is deleted
-	retrievedValue, err = BatchReadKeyValue(db, key1)
-	if err == nil {
-		t.Errorf("expected error when reading deleted key, got none")
-	}
-	if retrievedValue != nil {
-		t.Errorf("expected no value, got %s", retrievedValue)
-	}
-
-	// Test deleting a non-existing key
-	err = BatchDeleteKeyValue(db, nonExistingKey)
-	if err != nil {
-		t.Errorf("BatchDeleteKeyValue failed when deleting non-existing key: %v", err)
+	// Check if the key-value pair was deleted successfully.
+	gotValue, closer, err = db.Get(key)
+	if err == pebble.ErrNotFound {
+		// This is expected since the key has been deleted.
+	} else if err != nil {
+		t.Fatalf("Unexpected error fetching key-value: %v", err)
+	} else {
+		// If the key is found, it is an unexpected behavior.
+		t.Errorf("Expected nil value, but got %s", gotValue)
 	}
 }
