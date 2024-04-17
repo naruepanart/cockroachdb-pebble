@@ -90,3 +90,76 @@ func TestCrudFunctions(t *testing.T) {
 		t.Errorf("expected error for empty key, got none")
 	}
 }
+
+// BenchmarkCreateKeyValue measures the time taken to create key-value pairs in the Pebble database.
+func BenchmarkCreateKeyValue(b *testing.B) {
+	db := SetupDB()
+	defer db.Close()
+
+	key := []byte("benchmarkKey")
+	value := []byte("benchmarkValue")
+
+	// Reset the timer and start the benchmark
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := CreateKeyValue(db, key, value); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkReadKeyValue measures the time taken to read key-value pairs from the Pebble database.
+func BenchmarkReadKeyValue(b *testing.B) {
+	db := SetupDB()
+	defer db.Close()
+
+	key := []byte("benchmarkKey")
+	value := []byte("benchmarkValue")
+	CreateKeyValue(db, key, value)
+
+	// Reset the timer and start the benchmark
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := ReadKeyValue(db, key)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkUpdateKeyValue measures the time taken to update key-value pairs in the Pebble database.
+func BenchmarkUpdateKeyValue(b *testing.B) {
+	db := SetupDB()
+	defer db.Close()
+
+	key := []byte("benchmarkKey")
+	value := []byte("benchmarkValue")
+	CreateKeyValue(db, key, value)
+	newValue := []byte("updatedBenchmarkValue")
+
+	// Reset the timer and start the benchmark
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := UpdateKeyValue(db, key, newValue); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkDeleteKeyValue measures the time taken to delete key-value pairs from the Pebble database.
+func BenchmarkDeleteKeyValue(b *testing.B) {
+	db := SetupDB()
+	defer db.Close()
+
+	key := []byte("benchmarkKey")
+	value := []byte("benchmarkValue")
+	CreateKeyValue(db, key, value)
+
+	// Reset the timer and start the benchmark
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := DeleteKeyValue(db, key); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
