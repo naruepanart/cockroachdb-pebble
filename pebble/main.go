@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Define the database path
-	dbPath := "abc-pebble-db"
+	dbPath := "../abc-pebble-db"
 
 	// Open the Pebble database
 	db, err := pebble.Open(dbPath, &pebble.Options{})
