@@ -5,7 +5,6 @@ import (
 	"github.com/cockroachdb/pebble"
 )
 
-// CreateKeyValue adds a new key-value pair to the Pebble database.
 func CreateKeyValue(db *pebble.DB, key, value []byte) error {
 	// Check if the key or value is empty
 	if len(key) == 0 {
@@ -20,7 +19,6 @@ func CreateKeyValue(db *pebble.DB, key, value []byte) error {
 	return nil
 }
 
-// ReadKeyValue retrieves the value associated with a given key from the Pebble database.
 func ReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 	// Check if the key is empty
 	if len(key) == 0 {
@@ -32,11 +30,11 @@ func ReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get value for key: %w", err)
 	}
-	defer closer.Close() // Ensure the closer is closed properly
+
+	defer closer.Close()
 	return value, nil
 }
 
-// UpdateKeyValue updates an existing key-value pair with a new value in the Pebble database.
 func UpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 	// Check if the key or value is empty
 	if len(key) == 0 {
@@ -51,7 +49,6 @@ func UpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 	return nil
 }
 
-// DeleteKeyValue removes a key-value pair associated with a given key from the Pebble database.
 func DeleteKeyValue(db *pebble.DB, key []byte) error {
 	// Check if the key is empty
 	if len(key) == 0 {
