@@ -6,45 +6,84 @@ import (
 	"log"
 )
 
-func main() {
-	// Define the database path
-	dbPath := "../abc-pebble-db"
+const dbPath = "../abc-pebble-db"
 
-	// Open the Pebble database
-	db, err := leveldb.OpenFile(dbPath, nil)
+func main() {
+	db, err := openDatabase(dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	// Create
 	key := []byte("key1")
-	value := []byte("value1")
-	err = db.Put(key, value, nil)
+
+	// Perform create, read, update, delete operations
+	err = createKeyValue(db, key, []byte("value1"))
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	err = readKeyValue(db, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = updateKeyValue(db, key, []byte("newValue1"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = deleteKeyValue(db, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// openDatabase encapsulates the database opening and error handling
+func openDatabase(path string) (*leveldb.DB, error) {
+	db, err := leveldb.OpenFile(path, nil)
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+// createKeyValue encapsulates creating a key-value pair in the database
+func createKeyValue(db *leveldb.DB, key, value []byte) error {
+	err := db.Put(key, value, nil)
+	if err != nil {
+		return err
 	}
 	fmt.Println("Key-value pair created")
+	return nil
+}
 
-	// Read
-	v, err := db.Get(key, nil)
+// readKeyValue encapsulates reading a key-value pair from the database
+func readKeyValue(db *leveldb.DB, key []byte) error {
+	value, err := db.Get(key, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println(string(key), string(v))
+	fmt.Println(string(key), string(value))
+	return nil
+}
 
-	// Update
-	newValue := []byte("newValue1")
-	err = db.Put(key, newValue, nil)
+// updateKeyValue encapsulates updating a key-value pair in the database
+func updateKeyValue(db *leveldb.DB, key, value []byte) error {
+	err := db.Put(key, value, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Key-value pair updated")
+	return nil
+}
 
-	// Delete
-	err = db.Delete(key, nil)
+// deleteKeyValue encapsulates deleting a key-value pair from the database
+func deleteKeyValue(db *leveldb.DB, key []byte) error {
+	err := db.Delete(key, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Key-value pair deleted")
+	return nil
 }
