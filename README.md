@@ -1,4 +1,4 @@
-# cockroachdb-pebble
+# embedded database
 
 go test . --coverprofile=c.out
 
