@@ -14,7 +14,6 @@ func BatchCreateKeyValue(db *pebble.DB, key, value []byte) error {
 
 	batch.Set(key, value, nil)
 	batch.Commit(nil)
-
 	return nil
 }
 
@@ -25,7 +24,6 @@ func BatchReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to get value for key: %w", err)
 	}
 	defer closer.Close()
-
 	return value, nil
 }
 
@@ -53,7 +51,6 @@ func BatchReadKeyValueWorker(db *pebble.DB, keys []string) (map[string][]byte, e
 	}
 
 	wg.Wait()
-
 	return results, nil
 }
 
@@ -64,7 +61,6 @@ func BatchUpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 
 	batch.Set(key, newValue, nil)
 	batch.Commit(nil)
-
 	return nil
 }
 
@@ -75,6 +71,5 @@ func BatchDeleteKeyValue(db *pebble.DB, key []byte) error {
 
 	batch.Delete(key, nil)
 	batch.Commit(nil)
-
 	return nil
 }
