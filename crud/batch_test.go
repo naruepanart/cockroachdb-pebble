@@ -2,21 +2,11 @@ package crud
 
 import (
 	"testing"
-	"github.com/cockroachdb/pebble"
 )
 
 func TestBatchCrudFunctions(t *testing.T) {
-	// Define the database path
-	dbPath := "batch-test-db"
-
-	// Open the Pebble database
-	db, err := pebble.Open(dbPath, &pebble.Options{})
-	if err != nil {
-		t.Fatalf("failed to open Pebble database: %v", err)
-	}
+	db := SetupDB()
 	defer db.Close()
-
-	// Ensure the database is closed when the program exits
 
 	// Define key-value pairs for testing
 	key1 := []byte("key1")
