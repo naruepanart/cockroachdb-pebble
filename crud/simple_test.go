@@ -1,25 +1,16 @@
 package crud
 
 import (
-	"github.com/cockroachdb/pebble"
 	"testing"
 )
 
 func TestCrudFunctions(t *testing.T) {
-	// Define the database path
-	dbPath := "simple-test-db"
-
-	// Open the Pebble database
-	db, err := pebble.Open(dbPath, &pebble.Options{})
-	if err != nil {
-		t.Fatalf("failed to open Pebble database: %v", err)
-	}
-	defer db.Close() // Ensure the database is closed when the program exits
+	db := SetupDB()
+	defer db.Close()
 
 	// Define key-value pairs for testing
 	key1 := []byte("key1")
 	value1 := []byte("value1")
-
 
 	nonExistentKey := []byte("non_existent_key")
 
