@@ -2,8 +2,6 @@ package crud
 
 import (
 	"fmt"
-	"sync"
-
 	"github.com/cockroachdb/pebble"
 )
 
@@ -12,8 +10,8 @@ func BatchCreateKeyValue(db *pebble.DB, key, value []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	batch.Set(key, value, nil)
-	batch.Commit(nil)
+	batch.Set(key, value, pebble.NoSync)
+	batch.Commit(pebble.Sync)
 	return nil
 }
 
@@ -27,40 +25,13 @@ func BatchReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 	return value, nil
 }
 
-// handles multiple read operations concurrently using worker pools.
-func BatchReadKeyValueWorker(db *pebble.DB, keys []string) (map[string][]byte, error) {
-	results := make(map[string][]byte)
-	var mu sync.Mutex
-	var wg sync.WaitGroup
-	wg.Add(len(keys))
-
-	for _, key := range keys {
-		go func(key string) {
-			defer wg.Done()
-			value, closer, err := db.Get([]byte(key))
-			if err != nil {
-				// Handle error appropriately
-				return
-			}
-			defer closer.Close()
-
-			mu.Lock()
-			results[key] = value
-			mu.Unlock()
-		}(key)
-	}
-
-	wg.Wait()
-	return results, nil
-}
-
 // updates an existing key-value pair with a new value using a batch operation for improved performance.
 func BatchUpdateKeyValue(db *pebble.DB, key, newValue []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	batch.Set(key, newValue, nil)
-	batch.Commit(nil)
+	batch.Set(key, newValue, pebble.NoSync)
+	batch.Commit(pebble.Sync)
 	return nil
 }
 
@@ -69,7 +40,7 @@ func BatchDeleteKeyValue(db *pebble.DB, key []byte) error {
 	batch := db.NewBatch()
 	defer batch.Close()
 
-	batch.Delete(key, nil)
-	batch.Commit(nil)
+	batch.Delete(key, pebble.NoSync)
+	batch.Commit(pebble.Sync)
 	return nil
 }
