@@ -33,7 +33,6 @@ func ReadKeyValue(db *pebble.DB, key []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to get value for key: %w", err)
 	}
 	defer closer.Close() // Ensure the closer is closed properly
-
 	return value, nil
 }
 
