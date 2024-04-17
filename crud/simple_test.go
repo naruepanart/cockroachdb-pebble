@@ -94,7 +94,6 @@ func TestCrudFunctions(t *testing.T) {
 	}
 }
 
-// BenchmarkCreateKeyValue measures the time taken to create key-value pairs in the Pebble database.
 func BenchmarkCreateKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
@@ -109,10 +108,10 @@ func BenchmarkCreateKeyValue(b *testing.B) {
 		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
 		BatchCreateKeyValue(batch, key, value)
 	}
+
 	batch.Commit(pebble.Sync)
 }
 
-// BenchmarkReadKeyValue measures the time taken to read key-value pairs from the Pebble database.
 func BenchmarkReadKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
@@ -125,7 +124,6 @@ func BenchmarkReadKeyValue(b *testing.B) {
 	}
 }
 
-// BenchmarkUpdateKeyValue measures the time taken to update key-value pairs in the Pebble database.
 func BenchmarkUpdateKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
@@ -140,10 +138,10 @@ func BenchmarkUpdateKeyValue(b *testing.B) {
 		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
 		BatchCreateKeyValue(batch, key, value)
 	}
+
 	batch.Commit(pebble.Sync)
 }
 
-// BenchmarkDeleteKeyValue measures the time taken to delete key-value pairs from the Pebble database.
 func BenchmarkDeleteKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
