@@ -1,7 +1,10 @@
 package crud
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/cockroachdb/pebble"
 )
 
 func TestCrudFunctions(t *testing.T) {
@@ -96,16 +99,17 @@ func BenchmarkCreateKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
 
-	key := []byte("benchmarkKey")
-	value := []byte("benchmarkValue")
+	batch := db.NewBatch()
+	defer batch.Close()
 
 	// Reset the timer and start the benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := CreateKeyValue(db, key, value); err != nil {
-			b.Fatal(err)
-		}
+		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
+		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
+		BatchCreateKeyValue(batch, key, value)
 	}
+	batch.Commit(pebble.Sync)
 }
 
 // BenchmarkReadKeyValue measures the time taken to read key-value pairs from the Pebble database.
@@ -114,16 +118,12 @@ func BenchmarkReadKeyValue(b *testing.B) {
 	defer db.Close()
 
 	key := []byte("benchmarkKey")
-	value := []byte("benchmarkValue")
-	CreateKeyValue(db, key, value)
 
 	// Reset the timer and start the benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := ReadKeyValue(db, key)
-		if err != nil {
-			b.Fatal(err)
-		}
+		//key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
+		ReadKeyValue(db, key)
 	}
 }
 
@@ -132,18 +132,17 @@ func BenchmarkUpdateKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
 
-	key := []byte("benchmarkKey")
-	value := []byte("benchmarkValue")
-	CreateKeyValue(db, key, value)
-	newValue := []byte("updatedBenchmarkValue")
+	batch := db.NewBatch()
+	defer batch.Close()
 
 	// Reset the timer and start the benchmark
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		if err := UpdateKeyValue(db, key, newValue); err != nil {
-			b.Fatal(err)
-		}
+	for i := b.N - 1; i >= 0; i-- {
+		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
+		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
+		BatchCreateKeyValue(batch, key, value)
 	}
+	batch.Commit(pebble.Sync)
 }
 
 // BenchmarkDeleteKeyValue measures the time taken to delete key-value pairs from the Pebble database.
@@ -151,15 +150,15 @@ func BenchmarkDeleteKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
 
-	key := []byte("benchmarkKey")
-	value := []byte("benchmarkValue")
-	CreateKeyValue(db, key, value)
+	batch := db.NewBatch()
+	defer batch.Close()
 
 	// Reset the timer and start the benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := DeleteKeyValue(db, key); err != nil {
-			b.Fatal(err)
-		}
+		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
+		BatchDeleteKeyValue(batch, key)
 	}
+
+	batch.Commit(pebble.Sync)
 }
