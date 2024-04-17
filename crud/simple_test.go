@@ -2,7 +2,9 @@ package crud
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/cockroachdb/pebble"
 )
@@ -105,7 +107,7 @@ func BenchmarkCreateKeyValue(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
-		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
+		value := []byte(fmt.Sprintf("benchmarkKey_%s_%d", GenerateRandomString(50), i))
 		BatchCreateKeyValue(batch, key, value)
 	}
 
