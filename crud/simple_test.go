@@ -117,12 +117,10 @@ func BenchmarkReadKeyValue(b *testing.B) {
 	db := SetupDB()
 	defer db.Close()
 
-	key := []byte("benchmarkKey")
-
 	// Reset the timer and start the benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		//key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
+		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
 		ReadKeyValue(db, key)
 	}
 }
