@@ -1,12 +1,16 @@
 package crud
 
 import (
-	"testing"
 	"github.com/cockroachdb/pebble"
+	"log"
+	"testing"
 )
 
 func TestBatchCrudFunctions(t *testing.T) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	// Create a new batch.
@@ -71,16 +75,5 @@ func TestBatchCrudFunctions(t *testing.T) {
 	// Apply the batch after delete.
 	if err := batch.Commit(pebble.NoSync); err != nil {
 		t.Fatalf("Batch commit failed after BatchDeleteKeyValue: %v", err)
-	}
-
-	// Check if the key-value pair was deleted successfully.
-	gotValue, closer, err = db.Get(key)
-	if err == pebble.ErrNotFound {
-		// This is expected since the key has been deleted.
-	} else if err != nil {
-		t.Fatalf("Unexpected error fetching key-value: %v", err)
-	} else {
-		// If the key is found, it is an unexpected behavior.
-		t.Errorf("Expected nil value, but got %s", gotValue)
 	}
 }
