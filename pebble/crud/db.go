@@ -4,10 +4,13 @@ import (
 	"github.com/cockroachdb/pebble"
 )
 
-func SetupDB() *pebble.DB {
+func ConnPebbleDB() (*pebble.DB, error) {
 	// Define the database path
 	dbPath := "../abc-pebble-db"
 	// Open the Pebble database
-	db, _ := pebble.Open(dbPath, &pebble.Options{})
-	return db
+	db, err := pebble.Open(dbPath, &pebble.Options{})
+	if err != nil {
+		return nil, err
+	}
+	return db, err
 }
