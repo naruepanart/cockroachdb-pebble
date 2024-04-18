@@ -1,13 +1,14 @@
-package main
+package users
 
 import (
+	"abcc/pkg/database"
 	"fmt"
 	"log"
 	"testing"
 )
 
 func BenchmarkCreate(b *testing.B) {
-	db, err := ConnLevelDB()
+	db, err := database.ConnLevelDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +24,7 @@ func BenchmarkCreate(b *testing.B) {
 }
 
 func BenchmarkFindOne(b *testing.B) {
-	db, err := ConnLevelDB()
+	db, err := database.ConnLevelDB()
 	if err != nil {
 		log.Fatal(err)
 	}

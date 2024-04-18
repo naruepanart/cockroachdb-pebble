@@ -1,12 +1,14 @@
 package main
 
 import (
+	"abcc/pkg/database"
+	"abcc/pkg/users"
 	"fmt"
 	"log"
 )
 
 func main() {
-	db, err := ConnLevelDB()
+	db, err := database.ConnLevelDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -15,23 +17,23 @@ func main() {
 	key := []byte("key1")
 
 	// Perform create, read, update, delete operations
-	err = Create(db, key, []byte("value1"))
+	err = users.Create(db, key, []byte("value1"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	v, err := FindOne(db, key)
+	v, err := users.FindOne(db, key)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Print(string(v))
 
-	err = Update(db, key, []byte("newValue1"))
+	err = users.Update(db, key, []byte("newValue1"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = Remove(db, key)
+	err = users.Remove(db, key)
 	if err != nil {
 		log.Fatal(err)
 	}

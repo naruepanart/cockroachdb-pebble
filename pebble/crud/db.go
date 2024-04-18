@@ -5,9 +5,7 @@ import (
 )
 
 func ConnPebbleDB() (*pebble.DB, error) {
-	// Define the database path
-	dbPath := "../pebble-db"
-	// Open the Pebble database
+	dbPath := "abc-pebble-db"
 	db, err := pebble.Open(dbPath, &pebble.Options{})
 	if err != nil {
 		return nil, err
