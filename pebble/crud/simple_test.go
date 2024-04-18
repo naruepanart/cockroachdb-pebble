@@ -2,12 +2,17 @@ package crud
 
 import (
 	"fmt"
+	"log"
 	"testing"
+
 	"github.com/cockroachdb/pebble"
 )
 
 func TestCrudFunctions(t *testing.T) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	// Define key-value pairs for testing
@@ -94,7 +99,10 @@ func TestCrudFunctions(t *testing.T) {
 }
 
 func BenchmarkCreateKeyValue(b *testing.B) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	batch := db.NewBatch()
@@ -104,7 +112,7 @@ func BenchmarkCreateKeyValue(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
-		value := []byte(fmt.Sprintf("benchmarkKey_%s_%d", GenerateRandomString(50), i))
+		value := []byte(fmt.Sprintf("benchmarkKey_%d", i))
 		BatchCreateKeyValue(batch, key, value)
 	}
 
@@ -112,7 +120,10 @@ func BenchmarkCreateKeyValue(b *testing.B) {
 }
 
 func BenchmarkReadKeyValue(b *testing.B) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	// Reset the timer and start the benchmark
@@ -124,7 +135,10 @@ func BenchmarkReadKeyValue(b *testing.B) {
 }
 
 func BenchmarkUpdateKeyValue(b *testing.B) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	batch := db.NewBatch()
@@ -134,7 +148,7 @@ func BenchmarkUpdateKeyValue(b *testing.B) {
 	b.ResetTimer()
 	for i := b.N - 1; i >= 0; i-- {
 		key := []byte(fmt.Sprintf("benchmarkKey_%d", i))
-		value := []byte(fmt.Sprintf("benchmarkValue_%d", i))
+		value := []byte(fmt.Sprintf("benchmarkKey_Updated_%d", i))
 		BatchCreateKeyValue(batch, key, value)
 	}
 
@@ -142,7 +156,10 @@ func BenchmarkUpdateKeyValue(b *testing.B) {
 }
 
 func BenchmarkDeleteKeyValue(b *testing.B) {
-	db := SetupDB()
+	db, err := ConnPebbleDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	batch := db.NewBatch()
