@@ -7,7 +7,7 @@ import (
 )
 
 func BenchmarkCreate(b *testing.B) {
-	db, err := OpenDatabase(dbPath)
+	db, err := ConnLevelDB()
 	if err != nil {
 		log.Fatal(err)
 	}
