@@ -1,29 +1,21 @@
 package main
 
 import (
-	"abcc/crud"
 	"fmt"
-	"github.com/cockroachdb/pebble"
 	"log"
 )
 
 func main() {
-	// Define the database path
-	dbPath := "../abc-pebble-db"
-
-	// Open the Pebble database
-	db, err := pebble.Open(dbPath, &pebble.Options{})
+	db, err := ConnPebbleDB()
 	if err != nil {
-		log.Fatalf("failed to open Pebble database: %v", err)
+		log.Fatal(err)
 	}
-	defer db.Close() // Ensure the database is closed when the program exits
-
-	// Perform CRUD operations using helper functions
+	defer db.Close()
 
 	// Create
 	key := []byte("key1")
 	value := []byte("value1")
-	err = crud.CreateKeyValue(db, key, value)
+	err = CreateKeyValue(db, key, value)
 	if err != nil {
 		log.Fatalf("CreateKeyValue error: %v", err)
 	}
@@ -32,7 +24,7 @@ func main() {
 	// for i := 0; i < 100; i++ {
 	// 	key := []byte("key" + strconv.Itoa(i))
 	// 	value := []byte("value" + strconv.Itoa(i))
-	// 	err = crud.CreateKeyValue(db, key, value)
+	// 	err = CreateKeyValue(db, key, value)
 	// 	if err != nil {
 	// 		log.Fatalf("CreateKeyValue error: %v", err)
 	// 	}
@@ -40,7 +32,7 @@ func main() {
 	// }
 
 	// Read
-	retrievedValue, err := crud.ReadKeyValue(db, key)
+	retrievedValue, err := ReadKeyValue(db, key)
 	if err != nil {
 		log.Fatalf("ReadKeyValue error: %v", err)
 	}
@@ -48,14 +40,14 @@ func main() {
 
 	// Update
 	newValue := []byte("newValue1")
-	err = crud.UpdateKeyValue(db, key, newValue)
+	err = UpdateKeyValue(db, key, newValue)
 	if err != nil {
 		log.Fatalf("UpdateKeyValue error: %v", err)
 	}
 	fmt.Println("Key-value pair updated")
 
 	// Delete
-	err = crud.DeleteKeyValue(db, key)
+	err = DeleteKeyValue(db, key)
 	if err != nil {
 		log.Fatalf("DeleteKeyValue error: %v", err)
 	}

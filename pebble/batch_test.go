@@ -1,9 +1,10 @@
-package crud
+package main
 
 import (
-	"github.com/cockroachdb/pebble"
 	"log"
 	"testing"
+
+	"github.com/cockroachdb/pebble"
 )
 
 func TestBatchCrudFunctions(t *testing.T) {
