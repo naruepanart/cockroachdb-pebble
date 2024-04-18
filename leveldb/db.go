@@ -2,11 +2,11 @@ package main
 
 import "github.com/syndtr/goleveldb/leveldb"
 
-// OpenDatabase encapsulates the database opening and error handling
-func OpenDatabase(path string) (*leveldb.DB, error) {
-	db, err := leveldb.OpenFile(path, nil)
+func ConnLevelDB() (*leveldb.DB, error) {
+	dbPath := "../abc-pebble-db"
+	db, err := leveldb.OpenFile(dbPath, nil)
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+	return db, err
 }
