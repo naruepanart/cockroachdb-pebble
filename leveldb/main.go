@@ -5,10 +5,8 @@ import (
 	"log"
 )
 
-const dbPath = "../abc-pebble-db"
-
 func main() {
-	db, err := OpenDatabase(dbPath)
+	db, err := ConnLevelDB()
 	if err != nil {
 		log.Fatal(err)
 	}
